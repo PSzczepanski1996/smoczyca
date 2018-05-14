@@ -1,6 +1,7 @@
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
 import discord, os
 import glac, config
+import psutil, platform
 
 client = discord.Client()
 fTable = []
@@ -67,9 +68,19 @@ async def on_message(message):
         else:
             await client.send_message(message.channel, "Inorrect permission!")
 
-    if message.content.startswith('!ver'):
-        embed = discord.Embed(title="Discord.py version", description=discord.__version__)
-        await client.send_message(message.channel, embed=embed)
+    if message.content.startswith('!system'):
+        if(message.author.top_role.name in allow_permission):
+            ram = psutil.virtual_memory()
+            cpu = platform.processor()
+            cpu_usage = psutil.cpu_percent()
+            kernel = platform.release()
+            embed = discord.Embed(title="Smoczyca v2137 running on django.py ver:", description=discord.__version__)
+            embed.add_field(name="CPUInfo:", value="__Arch:__ {:s} | __Usage:__ {:d}/100".format(cpu, int(cpu_usage)), inline=False)
+            embed.add_field(name="RAM:", value="Usage: {:d}/{:d}".format(ram.free >> 20, ram.total >> 20), inline=False)
+            embed.add_field(name="Kernel:", value=kernel, inline=False)
+            await client.send_message(message.channel, embed=embed)
+        else:
+            await client.send_message(message.channel, "Inorrect permission!")
 
     if message.content.startswith('!glac'):
         data = glac.read()
