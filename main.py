@@ -8,9 +8,10 @@ allow_permission = ["Szef", "Schizol", "Zastępca"]
 
 def readShitpost():
     del fTable[:]
-    for filename in os.listdir("{:s}/shitpost/".format(os.getcwd())):
-        file = str.split(filename, ".")
-        fTable.append(file[0])
+    with open("shitpost.txt") as file:
+        for line in file:
+            cmd = line.split(" ")
+            fTable.append(cmd[0])
 
 readShitpost()
 
@@ -23,40 +24,48 @@ async def on_message(message):
     if message.content.startswith(tuple(fTable)):
         cmdBuff = message.content.split(" ")
         cmd = cmdBuff[0]
-        fBuffer = open("./shitpost/{:s}.meme".format(cmd), "r+")
-        msg = ''
-        msg = fBuffer.read()
-        await client.send_message(message.channel, msg)
-
-    if message.content.startswith('!checkrole'):
-        msg = message.author.top_role
+        index = fTable.index(cmd)
+        fBuffer = open("shitpost.txt", "r")
+        with fBuffer as file:
+            for i, line in enumerate(file):
+                if i == index:
+                    cmdBuff = line.split(" ")
+                    msg = ' '.join(cmdBuff[1:])
+        fBuffer.close()
         await client.send_message(message.channel, msg)
 
     if message.content.startswith('!add'):
         if(message.author.top_role.name in allow_permission):
             msg = message.content.split(" ")
             if(len(msg) > 2):
-                fName = msg[1]
-                fContent = ' '.join(msg[2:])
-                fBuffer = open("./shitpost/{:s}.meme".format(fName), "w+")
-                fBuffer.write(fContent)
+                fContent = ' '.join(msg[1:])
+                fBuffer = open("shitpost.txt", "a")
+                fBuffer.write(fContent + '\n')
                 await client.send_message(message.channel, ("Added command: {:s}".format(msg[1])))
                 fBuffer.close()
                 readShitpost()
             else:
                 await client.send_message(message.channel, "Three or more words needed!")
         else:
-            await client.send_message(message.channel, "No correct permission!")
+            await client.send_message(message.channel, "Incorrect permission!")
 
     if message.content.startswith('!delete'):
         if(message.author.top_role.name in allow_permission):
-            msg = message.content.split(" ")
-            fName = msg[1]
-            os.remove("./shitpost/{:s}.meme".format(fName))
-            await client.send_message(message.channel, ("Deleted file!"))
+            cmdBuff = message.content.split(" ")
+            cmd = cmdBuff[1]
+            fBuffer = open("shitpost.txt", "r")
+            lines = fBuffer.readlines()
+            fBuffer.close()
+            fBuffer = open("shitpost.txt", "w")
+            with fBuffer as file:
+                for line in lines:
+                    if not line.startswith(cmd):
+                        file.write(line)
+            fBuffer.close()
+            await client.send_message(message.channel, ("Deleted command!"))
             readShitpost()
         else:
-            await client.send_message(message.channel, "No correct permission!")
+            await client.send_message(message.channel, "Inorrect permission!")
 
     if message.content.startswith('!ver'):
         embed = discord.Embed(title="Discord.py version", description=discord.__version__)
