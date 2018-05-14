@@ -76,7 +76,7 @@ async def on_message(message):
             kernel = platform.release()
             embed = discord.Embed(title="Smoczyca v2137 running on django.py ver:", description=discord.__version__)
             embed.add_field(name="CPUInfo:", value="__Arch:__ {:s} | __Usage:__ {:d}/100".format(cpu, int(cpu_usage)), inline=False)
-            embed.add_field(name="RAM:", value="Usage: {:d}/{:d}".format(ram.free >> 20, ram.total >> 20), inline=False)
+            embed.add_field(name="RAM:", value="__Usage__: {:d}/{:d}".format(ram.used >> 20, ram.total >> 20), inline=False)
             embed.add_field(name="Kernel:", value=kernel, inline=False)
             await client.send_message(message.channel, embed=embed)
         else:
