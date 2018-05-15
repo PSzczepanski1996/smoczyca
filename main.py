@@ -74,7 +74,7 @@ async def on_message(message):
             cpu = platform.processor()
             cpu_usage = psutil.cpu_percent()
             kernel = platform.release()
-            embed = discord.Embed(title="Smoczyca v2137 running on django.py ver:", description=discord.__version__)
+            embed = discord.Embed(title="Smoczyca v2137 running on discord.py ver:", description=discord.__version__)
             embed.add_field(name="CPUInfo:", value="__Arch:__ {:s} | __Usage:__ {:d}/100".format(cpu, int(cpu_usage)), inline=False)
             embed.add_field(name="RAM:", value="__Usage__: {:d}/{:d}".format(ram.used >> 20, ram.total >> 20), inline=False)
             embed.add_field(name="Kernel:", value=kernel, inline=False)
