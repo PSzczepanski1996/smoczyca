@@ -1,11 +1,11 @@
-# https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
+# Smoczyca 2018 by Hoshi, all memes reserved
+from config import *
 import discord, os, random
-import glac, config
+import glac
 import psutil, platform
 
 client = discord.Client()
 fTable = []
-allow_permission = ["Szef", "Schizol", "Zastępca"]
 
 def readShitpost():
     del fTable[:]
@@ -115,6 +115,6 @@ async def on_message(message):
 @client.event
 async def on_ready():
     print("Logged in as {:s} as ID: {:s}".format(client.user.name, client.user.id))
-    print('------')
+    print('-------')
 
-client.run(config.returnToken())
+client.run(token)
