@@ -11,7 +11,7 @@ def readShitpost():
     del fTable[:]
     with open("shitpost.txt") as file:
         for line in file:
-            cmd = line.split(" ")
+            cmd = line.split()
             fTable.append(cmd[0])
 
 readShitpost()
@@ -23,21 +23,21 @@ async def on_message(message):
         return
 
     if message.content.startswith(tuple(fTable)):
-        cmdBuff = message.content.split(" ")
+        cmdBuff = message.content.split()
         cmd = cmdBuff[0]
         index = fTable.index(cmd)
         fBuffer = open("shitpost.txt", "r")
         with fBuffer as file:
             for i, line in enumerate(file):
                 if i == index:
-                    cmdBuff = line.split(" ")
+                    cmdBuff = line.split()
                     msg = ' '.join(cmdBuff[1:])
         fBuffer.close()
         await client.send_message(message.channel, msg)
 
     if message.content.startswith('!add'):
         if(message.author.top_role.name in allow_permission):
-            msg = message.content.split(" ")
+            msg = message.content.split()
             if(len(msg) > 2):
                 fContent = ' '.join(msg[1:])
                 fBuffer = open("shitpost.txt", "a")
@@ -51,22 +51,31 @@ async def on_message(message):
             await client.send_message(message.channel, "Incorrect permission!")
 
     if message.content.startswith('!delete'):
-        if(message.author.top_role.name in allow_permission):
-            cmdBuff = message.content.split(" ")
-            cmd = cmdBuff[1]
-            fBuffer = open("shitpost.txt", "r")
-            lines = fBuffer.readlines()
-            fBuffer.close()
-            fBuffer = open("shitpost.txt", "w")
-            with fBuffer as file:
-                for line in lines:
-                    if not line.startswith(cmd):
-                        file.write(line)
-            fBuffer.close()
-            await client.send_message(message.channel, ("Deleted command!"))
-            readShitpost()
+        if(len(message.content.split()) > 1):
+            if(message.author.top_role.name in allow_permission):
+                Deleted = False
+                cmdBuff = message.content.split()
+                cmd = cmdBuff[1]
+                fBuffer = open("shitpost.txt", "r")
+                lines = fBuffer.readlines()
+                fBuffer.close()
+                fBuffer = open("shitpost.txt", "w")
+                with fBuffer as file:
+                    for line in lines:
+                        if not line.startswith(cmd):
+                            file.write(line)
+                        else:
+                            Deleted = True
+                fBuffer.close()
+                if(Deleted):
+                    await client.send_message(message.channel, ("Deleted command!"))
+                    readShitpost()
+                else:
+                    await client.send_message(message.channel, ("Nothing to delete!"))
+            else:
+                await client.send_message(message.channel, "Inorrect permission!")
         else:
-            await client.send_message(message.channel, "Inorrect permission!")
+            await client.send_message(message.channel, "No command written!")
 
     if message.content.startswith('!system'):
         if(message.author.top_role.name in allow_permission):
@@ -96,9 +105,12 @@ async def on_message(message):
                 await client.send_message(message.channel, msg)
 
     if message.content.startswith("!choose"):
-        rest = message.content.split(' ', 1)[1]
-        choose = rest.split('|')
-        await client.send_message(message.channel, choose[random.randint(0, len(choose)-1)])
+        if(len(message.content.split()) > 1):
+            rest = message.content.split(' ', 1)[1]
+            choose = rest.split('|')
+            await client.send_message(message.channel, choose[random.randint(0, len(choose)-1)])
+        else:
+            await client.send_message(message.channel, "No words to choose!")
 
 @client.event
 async def on_ready():
