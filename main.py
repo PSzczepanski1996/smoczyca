@@ -1,5 +1,5 @@
 # https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
-import discord, os
+import discord, os, random
 import glac, config
 import psutil, platform
 
@@ -94,6 +94,11 @@ async def on_message(message):
             for user in message.mentions:
                 msg = user.avatar_url
                 await client.send_message(message.channel, msg)
+
+    if message.content.startswith("!choose"):
+        rest = message.content.split(' ', 1)[1]
+        choose = rest.split('|')
+        await client.send_message(message.channel, choose[random.randint(0, len(choose)-1)])
 
 @client.event
 async def on_ready():
