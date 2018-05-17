@@ -6,6 +6,7 @@ import psutil, platform
 
 client = discord.Client()
 fTable = []
+cmd_list = ['!add', '!delete', '!system', '!glac', '!avatar', '!choose', '!help']
 
 def readShitpost():
     del fTable[:]
@@ -39,12 +40,21 @@ async def on_message(message):
         if(message.author.top_role.name in allow_permission):
             msg = message.content.split()
             if(len(msg) > 2):
-                fContent = ' '.join(msg[1:])
-                fBuffer = open("shitpost.txt", "a")
-                fBuffer.write(fContent + '\n')
-                await client.send_message(message.channel, ("Added command: {:s}".format(msg[1])))
-                fBuffer.close()
-                readShitpost()
+                if(msg[1] != '!'):
+                    if(msg[1] not in fTable):
+                        if(msg[1] not in cmd_list):
+                            fContent = ' '.join(msg[1:])
+                            fBuffer = open("shitpost.txt", "a")
+                            fBuffer.write(fContent + '\n')
+                            await client.send_message(message.channel, ("Added command: {:s}".format(msg[1])))
+                            fBuffer.close()
+                            readShitpost()
+                        else:
+                            await client.send_message(message.channel, "Don't add already existing commands!")
+                    else: 
+                        await client.send_message(message.channel, "Command already exist!")
+                else:
+                    await client.send_message(message.channel, "It can't be only !")
             else:
                 await client.send_message(message.channel, "Three or more words needed!")
         else:
@@ -111,6 +121,9 @@ async def on_message(message):
             await client.send_message(message.channel, choose[random.randint(0, len(choose)-1)])
         else:
             await client.send_message(message.channel, "No words to choose!")
+
+    if message.content.startswith("!help"):
+        await client.send_message(message.channel, "Existing commands: {:s}".format(' '.join(cmd_list)))
 
 @client.event
 async def on_ready():
