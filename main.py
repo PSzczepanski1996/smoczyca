@@ -43,19 +43,22 @@ async def on_command_error(ctx, error):
 @bot.command()
 async def add(ctx, arg, *args):
     if(ctx.message.author.top_role.name in allow_permission):
-        if(arg not in fTable):
-            if arg and args:
-                fContent = ' '.join(args)
-                fBuffer = open("shitpost.txt", "a")
-                fBuffer.write(arg + ' ')
-                fBuffer.write(fContent + '\n')
-                await ctx.send("Added command: {:s}".format(arg))
-                fBuffer.close()
-                readShitpost()
+        if arg and args:
+            if(arg[0] == '!'):
+                if(arg not in fTable):
+                    fContent = ' '.join(args)
+                    fBuffer = open("shitpost.txt", "a")
+                    fBuffer.write(arg + ' ')
+                    fBuffer.write(fContent + '\n')
+                    await ctx.send("Added command: {:s}".format(arg))
+                    fBuffer.close()
+                    readShitpost()
+                else:
+                    await ctx.send("Command already exist!")
             else:
-                await ctx.send("No command given!")
+                await ctx.send("Command does not start with !")
         else:
-            await ctx.send("Command already exist!")
+            await ctx.send("No command given!")
     else:
         await ctx.send("Incorrect permission!")
 
