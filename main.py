@@ -3,10 +3,14 @@ from config import *
 import discord, os, random
 import glac
 import psutil, platform
+from discord.ext import commands
 
-client = discord.Client()
 fTable = []
-cmd_list = ['!add', '!delete', '!system', '!glac', '!avatar', '!choose', '!help']
+desc = "Smoczyca meme bot."
+bot = commands.Bot(command_prefix="!", description=desc)
+
+async def shitpost(ctx):
+    ctx.send("Lol")
 
 def readShitpost():
     del fTable[:]
@@ -17,14 +21,14 @@ def readShitpost():
 
 readShitpost()
 
-@client.event
-async def on_message(message):
-    # we do not want the bot to reply to itself
-    if message.author == client.user:
-        return
+@bot.event
+async def on_ready():
+    print("Logged in as {0} | ID: {1}!".format(bot.user.name, bot.user.id))
 
-    if message.content.startswith(tuple(fTable)):
-        cmdBuff = message.content.split()
+@bot.event
+async def on_command_error(ctx, error):
+    if(ctx.message.content.startswith(tuple(fTable))):
+        cmdBuff = ctx.message.content.split()
         cmd = cmdBuff[0]
         index = fTable.index(cmd)
         fBuffer = open("shitpost.txt", "r")
@@ -34,100 +38,85 @@ async def on_message(message):
                     cmdBuff = line.split()
                     msg = ' '.join(cmdBuff[1:])
         fBuffer.close()
-        await client.send_message(message.channel, msg)
+        await ctx.send(msg)
 
-    if message.content.startswith('!add'):
-        if(message.author.top_role.name in allow_permission):
-            msg = message.content.split()
-            if(len(msg) > 2):
-                if(msg[1] != '!'):
-                    if(msg[1] not in fTable):
-                        if(msg[1] not in cmd_list):
-                            fContent = ' '.join(msg[1:])
-                            fBuffer = open("shitpost.txt", "a")
-                            fBuffer.write(fContent + '\n')
-                            await client.send_message(message.channel, ("Added command: {:s}".format(msg[1])))
-                            fBuffer.close()
-                            readShitpost()
-                        else:
-                            await client.send_message(message.channel, "Don't add already existing commands!")
-                    else: 
-                        await client.send_message(message.channel, "Command already exist!")
-                else:
-                    await client.send_message(message.channel, "It can't be only !")
-            else:
-                await client.send_message(message.channel, "Three or more words needed!")
-        else:
-            await client.send_message(message.channel, "Incorrect permission!")
-
-    if message.content.startswith('!delete'):
-        if(len(message.content.split()) > 1):
-            if(message.author.top_role.name in allow_permission):
-                Deleted = False
-                cmdBuff = message.content.split()
-                cmd = cmdBuff[1]
-                fBuffer = open("shitpost.txt", "r")
-                lines = fBuffer.readlines()
+@bot.command()
+async def add(ctx, arg, *args):
+    if(ctx.message.author.top_role.name in allow_permission):
+        if(arg not in fTable):
+            if arg and args:
+                fContent = ' '.join(args)
+                fBuffer = open("shitpost.txt", "a")
+                fBuffer.write(arg + ' ')
+                fBuffer.write(fContent + '\n')
+                await ctx.send("Added command: {:s}".format(arg))
                 fBuffer.close()
-                fBuffer = open("shitpost.txt", "w")
-                with fBuffer as file:
-                    for line in lines:
-                        if not line.startswith(cmd):
-                            file.write(line)
-                        else:
-                            Deleted = True
-                fBuffer.close()
-                if(Deleted):
-                    await client.send_message(message.channel, ("Deleted command!"))
-                    readShitpost()
-                else:
-                    await client.send_message(message.channel, ("Nothing to delete!"))
+                readShitpost()
             else:
-                await client.send_message(message.channel, "Inorrect permission!")
+                await ctx.send("No command given!")
         else:
-            await client.send_message(message.channel, "No command written!")
+            await ctx.send("Command already exist!")
+    else:
+        await ctx.send("Incorrect permission!")
 
-    if message.content.startswith('!system'):
-        if(message.author.top_role.name in allow_permission):
-            ram = psutil.virtual_memory()
-            cpu = platform.processor()
-            cpu_usage = psutil.cpu_percent()
-            kernel = platform.release()
-            embed = discord.Embed(title="Smoczyca v2137 running on discord.py ver:", description=discord.__version__)
-            embed.add_field(name="CPUInfo:", value="__Arch:__ {:s} | __Usage:__ {:d}/100".format(cpu, int(cpu_usage)), inline=False)
-            embed.add_field(name="RAM:", value="__Usage__: {:d}/{:d}".format(ram.used >> 20, ram.total >> 20), inline=False)
-            embed.add_field(name="Kernel:", value=kernel, inline=False)
-            await client.send_message(message.channel, embed=embed)
+@bot.command()
+async def delete(ctx, arg):
+    if(ctx.message.author.top_role.name in allow_permission):
+        Deleted = False
+        fBuffer = open("shitpost.txt", "r")
+        lines = fBuffer.readlines()
+        fBuffer.close()
+        fBuffer = open("shitpost.txt", "w")
+        with fBuffer as file:
+            for line in lines:
+                if not line.startswith(arg):
+                    file.write(line)
+                else:
+                    Deleted = True
+        fBuffer.close()
+        if(Deleted):
+            await ctx.send("Deleted command!")
         else:
-            await client.send_message(message.channel, "Inorrect permission!")
+            await ctx.send("Nothing to delete!")
+    else:
+        await ctx.send("Incorrect permissions!")
 
-    if message.content.startswith('!glac'):
-        data = glac.read()
-        embed = discord.Embed(title="Status glacy", description="Kochajmy glacowiczów, tak szybko umierają.")
-        embed.add_field(name="Anioły", value=data["angels"]["progress"], inline=False)
-        embed.add_field(name="Demony", value=data["demons"]["progress"], inline=False)
-        await client.send_message(message.channel, embed=embed)
+@bot.command()
+async def system(ctx):
+    if(ctx.message.author.top_role.name in allow_permission):
+        ram = psutil.virtual_memory()
+        cpu = platform.processor()
+        cpu_usage = psutil.cpu_percent()
+        kernel = platform.release()
+        embed = discord.Embed(title="Smoczyca v2137 running on discord.py ver:", description=discord.__version__)
+        embed.add_field(name="CPUInfo:", value="__Arch:__ {:s} | __Usage:__ {:d}/100".format(cpu, int(cpu_usage)), inline=False)
+        embed.add_field(name="RAM:", value="__Usage__: {:d}/{:d}".format(ram.used >> 20, ram.total >> 20), inline=False)
+        embed.add_field(name="Kernel:", value=kernel, inline=False)
+        await ctx.send(embed=embed)
+    else:
+        await ctx.send("Incorrect permission!")
 
-    if message.content.startswith('!avatar'):
-        if len(message.mentions) > 0:
-            for user in message.mentions:
-                msg = user.avatar_url
-                await client.send_message(message.channel, msg)
+@bot.command()
+async def glac(ctx):
+    data = glac.read
+    embed = discord.Embed(title="Status glacy", description="Kochajmy glacowiczów, tak szybko umierają.")
+    embed.add_field(name="Anioły", value=data["angels"]["progress"], inline=False)
+    embed.add_field(name="Demony", value=data["demons"]["progress"], inline=False)
+    await ctx.send(embed=embed)
 
-    if message.content.startswith("!choose"):
-        if(len(message.content.split()) > 1):
-            rest = message.content.split(' ', 1)[1]
-            choose = rest.split('|')
-            await client.send_message(message.channel, choose[random.randint(0, len(choose)-1)])
-        else:
-            await client.send_message(message.channel, "No words to choose!")
+@bot.command()
+async def avatar(ctx):
+    if len(ctx.message.mentions) > 0:
+        for user in ctx.message.mentions:
+            await ctx.send(user.avatar_url)
 
-    if message.content.startswith("!help"):
-        await client.send_message(message.channel, "Existing commands: {:s}".format(' '.join(cmd_list)))
+@bot.command()
+async def choose(ctx, *args):
+    if(len(args) > 2):
+        content = ' '.join(args)
+        choose = content.split('|')
+        await ctx.send(choose[random.randint(0, len(choose)-1)])
+    else:
+        await ctx.send("No words to choose!")
 
-@client.event
-async def on_ready():
-    print("Logged in as {:s} as ID: {:s}".format(client.user.name, client.user.id))
-    print('-------')
-
-client.run(token)
+bot.run(token)
