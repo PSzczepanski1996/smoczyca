@@ -79,6 +79,7 @@ async def delete(ctx, arg):
         fBuffer.close()
         if(Deleted):
             await ctx.send("Deleted command!")
+            readShitpost()
         else:
             await ctx.send("Nothing to delete!")
     else:
