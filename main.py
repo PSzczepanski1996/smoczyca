@@ -9,9 +9,6 @@ fTable = []
 desc = "Smoczyca meme bot."
 bot = commands.Bot(command_prefix="!", description=desc)
 
-async def shitpost(ctx):
-    ctx.send("Lol")
-
 def readShitpost():
     del fTable[:]
     with open("shitpost.txt") as file:
