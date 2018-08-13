@@ -1,7 +1,7 @@
 # Smoczyca 2018 by Hoshi, all memes reserved
 from config import *
 import discord, os, random
-import glac
+import glac_lib
 import psutil, platform
 from discord.ext import commands
 
@@ -99,7 +99,7 @@ async def system(ctx):
 
 @bot.command()
 async def glac(ctx):
-    data = glac.read
+    data = glac_lib.read()
     embed = discord.Embed(title="Status glacy", description="Kochajmy glacowiczów, tak szybko umierają.")
     embed.add_field(name="Anioły", value=data["angels"]["progress"], inline=False)
     embed.add_field(name="Demony", value=data["demons"]["progress"], inline=False)
