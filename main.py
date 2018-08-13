@@ -40,7 +40,7 @@ async def on_command_error(ctx, error):
 @bot.command()
 async def add(ctx, arg, *args):
     if(ctx.message.author.top_role.name in allow_permission):
-        if arg and args:
+        if args:
             if(arg[0] == '!'):
                 if(arg not in fTable):
                     fContent = ' '.join(args)
@@ -55,7 +55,7 @@ async def add(ctx, arg, *args):
             else:
                 await ctx.send("Command does not start with !")
         else:
-            await ctx.send("No command given!")
+            await ctx.send("No command content given!")
     else:
         await ctx.send("Incorrect permission!")
 
@@ -98,12 +98,15 @@ async def system(ctx):
         await ctx.send("Incorrect permission!")
 
 @bot.command()
-async def glac(ctx):
-    data = glac_lib.read()
-    embed = discord.Embed(title="Status glacy", description="Kochajmy glacowiczów, tak szybko umierają.")
-    embed.add_field(name="Anioły", value=data["angels"]["progress"], inline=False)
-    embed.add_field(name="Demony", value=data["demons"]["progress"], inline=False)
-    await ctx.send(embed=embed)
+async def glac(ctx, arg='s1'):
+    data = glac_lib.read(arg)
+    if data is not None:
+        embed = discord.Embed(title="Status glacy", description="[{0}] Kochajmy glacowiczów, tak szybko umierają.".format(arg))
+        embed.add_field(name="Anioły", value=data["angels"]["progress"], inline=False)
+        embed.add_field(name="Demony", value=data["demons"]["progress"], inline=False)
+        await ctx.send(embed=embed)
+    else:
+        await ctx.send("Server not found!")
 
 @bot.command()
 async def avatar(ctx):
