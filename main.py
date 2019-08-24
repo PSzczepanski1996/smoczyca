@@ -1,6 +1,6 @@
 # Smoczyca 2018 by Hoshi, all memes reserved
 from config import *
-import discord, os, random
+import discord, random
 import glac_lib
 import psutil, platform
 from discord.ext import commands
@@ -9,6 +9,7 @@ fTable = []
 desc = "Smoczyca meme bot."
 bot = commands.Bot(command_prefix="!", description=desc)
 
+
 def readShitpost():
     del fTable[:]
     with open("shitpost.txt") as file:
@@ -16,15 +17,18 @@ def readShitpost():
             cmd = line.split()
             fTable.append(cmd[0])
 
+
 readShitpost()
+
 
 @bot.event
 async def on_ready():
     print("Logged in as {0} | ID: {1}!".format(bot.user.name, bot.user.id))
 
+
 @bot.event
 async def on_command_error(ctx, error):
-    if(ctx.message.content.startswith(tuple(fTable))):
+    if ctx.message.content.startswith(tuple(fTable)):
         cmdBuff = ctx.message.content.split()
         cmd = cmdBuff[0]
         index = fTable.index(cmd)
@@ -37,12 +41,13 @@ async def on_command_error(ctx, error):
         fBuffer.close()
         await ctx.send(msg)
 
+
 @bot.command()
 async def add(ctx, arg, *args):
-    if(ctx.message.author.top_role.name in allow_permission):
+    if ctx.message.author.top_role.name in allow_permission:
         if args:
-            if(arg[0] == '!'):
-                if(arg not in fTable):
+            if arg[0] == '!':
+                if arg not in fTable:
                     fContent = ' '.join(args)
                     fBuffer = open("shitpost.txt", "a")
                     fBuffer.write(arg + ' ')
@@ -59,9 +64,10 @@ async def add(ctx, arg, *args):
     else:
         await ctx.send("Incorrect permission!")
 
+
 @bot.command()
 async def delete(ctx, arg):
-    if(ctx.message.author.top_role.name in allow_permission):
+    if ctx.message.author.top_role.name in allow_permission:
         Deleted = False
         fBuffer = open("shitpost.txt", "r")
         lines = fBuffer.readlines()
@@ -82,9 +88,10 @@ async def delete(ctx, arg):
     else:
         await ctx.send("Incorrect permissions!")
 
+
 @bot.command()
 async def system(ctx):
-    if(ctx.message.author.top_role.name in allow_permission):
+    if ctx.message.author.top_role.name in allow_permission:
         ram = psutil.virtual_memory()
         cpu = platform.processor()
         cpu_usage = psutil.cpu_percent()
@@ -97,6 +104,7 @@ async def system(ctx):
     else:
         await ctx.send("Incorrect permission!")
 
+
 @bot.command()
 async def glac(ctx, arg='s1'):
     data = glac_lib.read(arg)
@@ -108,15 +116,17 @@ async def glac(ctx, arg='s1'):
     else:
         await ctx.send("Server not found!")
 
+
 @bot.command()
 async def avatar(ctx):
     if len(ctx.message.mentions) > 0:
         for user in ctx.message.mentions:
             await ctx.send(user.avatar_url)
 
+
 @bot.command()
 async def choose(ctx, *args):
-    if(len(args) > 2):
+    if len(args) > 2:
         content = ' '.join(args)
         choose = content.split('|')
         await ctx.send(choose[random.randint(0, len(choose)-1)])
