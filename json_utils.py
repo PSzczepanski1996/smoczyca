@@ -1,5 +1,6 @@
 """Utils for JSON support instead of doing raw write to file."""
 import json
+import os
 
 
 def read_json_file(path):
@@ -7,6 +8,13 @@ def read_json_file(path):
     with open(path, 'r', encoding='utf-8') as f:
         json_dict = json.load(f)
     return json_dict
+
+
+def init_file_existence(path):
+    """Check file existence, if not, create it."""
+    if not os.path.exists(path):
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump({}, f, ensure_ascii=False, indent=4)
 
 
 def add_shitpost_record(command, raw_msg):

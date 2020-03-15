@@ -7,11 +7,13 @@ import psutil
 from discord.ext import commands
 
 import glac_lib
-from json_utils import read_json_file, add_shitpost_record, delete_shitpost_record
+from json_utils import (add_shitpost_record, delete_shitpost_record,
+                        init_file_existence, read_json_file)
 
 config = read_json_file('config.json')
 desc = 'Smoczyca meme bot.'
 bot = commands.Bot(command_prefix="!", description=desc)
+init_file_existence('shitpost.json')
 
 
 @bot.event
