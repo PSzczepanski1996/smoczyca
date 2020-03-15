@@ -1,4 +1,6 @@
-import urllib.request, json 
+import json
+import urllib.request
+
 
 def read(server):
     api_url = {

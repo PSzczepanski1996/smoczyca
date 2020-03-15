@@ -1,88 +1,54 @@
-# Smoczyca 2018 by Hoshi, all memes reserved
-from config import *
-import discord, random
-import glac_lib
-import psutil, platform
+# Smoczyca 2020 by Hoshi Yemazaki, all memes reserved
+import platform
+import random
+
+import discord
+import psutil
 from discord.ext import commands
 
-fTable = []
-desc = "Smoczyca meme bot."
+import glac_lib
+from json_utils import read_json_file, add_shitpost_record, delete_shitpost_record
+
+config = read_json_file('config.json')
+desc = 'Smoczyca meme bot.'
 bot = commands.Bot(command_prefix="!", description=desc)
-
-
-def readShitpost():
-    del fTable[:]
-    with open("shitpost.txt") as file:
-        for line in file:
-            cmd = line.split()
-            fTable.append(cmd[0])
-
-
-readShitpost()
 
 
 @bot.event
 async def on_ready():
-    print("Logged in as {0} | ID: {1}!".format(bot.user.name, bot.user.id))
+    """Print that bot logged in as."""
+    print(f'Logged in as {bot.user.name} | ID: {bot.user.id}!')
 
 
 @bot.event
 async def on_command_error(ctx, error):
-    if ctx.message.content.startswith(tuple(fTable)):
-        cmdBuff = ctx.message.content.split()
-        cmd = cmdBuff[0]
-        index = fTable.index(cmd)
-        fBuffer = open("shitpost.txt", "r")
-        with fBuffer as file:
-            for i, line in enumerate(file):
-                if i == index:
-                    cmdBuff = line.split()
-                    msg = ' '.join(cmdBuff[1:])
-        fBuffer.close()
-        await ctx.send(msg)
+    shitpost = read_json_file('shitpost.json')
+    command = ctx.message.content
+    if command in shitpost.keys():
+        await ctx.send(shitpost[command])
 
 
 @bot.command()
 async def add(ctx, arg, *args):
-    if ctx.message.author.top_role.name in allow_permission:
-        if args:
-            if arg[0] == '!':
-                if arg not in fTable:
-                    fContent = ' '.join(args)
-                    fBuffer = open("shitpost.txt", "a")
-                    fBuffer.write(arg + ' ')
-                    fBuffer.write(fContent + '\n')
-                    await ctx.send("Added command: {:s}".format(arg))
-                    fBuffer.close()
-                    readShitpost()
-                else:
-                    await ctx.send("Command already exist!")
+    if ctx.message.author.top_role.name in config.get('allow_permission', []):
+        if args and arg[0] == '!':
+            shitpost_keys = read_json_file('shitpost.json').get('shitpost', {}).keys()
+            if arg not in shitpost_keys:
+                add_shitpost_record(arg, ' '.join(args))
+                await ctx.send(f'Added command: {arg}')
             else:
-                await ctx.send("Command does not start with !")
+                await ctx.send('Command already exist!')
         else:
-            await ctx.send("No command content given!")
+            await ctx.send('Command does not start with ! or either does not have content.')
     else:
-        await ctx.send("Incorrect permission!")
+        await ctx.send('Incorrect permission!')
 
 
 @bot.command()
 async def delete(ctx, arg):
-    if ctx.message.author.top_role.name in allow_permission:
-        Deleted = False
-        fBuffer = open("shitpost.txt", "r")
-        lines = fBuffer.readlines()
-        fBuffer.close()
-        fBuffer = open("shitpost.txt", "w")
-        with fBuffer as file:
-            for line in lines:
-                if not line.startswith(arg):
-                    file.write(line)
-                else:
-                    Deleted = True
-        fBuffer.close()
-        if(Deleted):
+    if ctx.message.author.top_role.name in config.get('allow_permission', []):
+        if delete_shitpost_record(arg):
             await ctx.send("Deleted command!")
-            readShitpost()
         else:
             await ctx.send("Nothing to delete!")
     else:
@@ -91,15 +57,20 @@ async def delete(ctx, arg):
 
 @bot.command()
 async def system(ctx):
-    if ctx.message.author.top_role.name in allow_permission:
+    if ctx.message.author.top_role.name in config.get('allow_permission', []):
         ram = psutil.virtual_memory()
         cpu = platform.processor()
         cpu_usage = psutil.cpu_percent()
         kernel = platform.release()
-        embed = discord.Embed(title="Smoczyca v2137 running on discord.py ver:", description=discord.__version__)
-        embed.add_field(name="CPUInfo:", value="__Arch:__ {:s} | __Usage:__ {:d}/100".format(cpu, int(cpu_usage)), inline=False)
-        embed.add_field(name="RAM:", value="__Usage__: {:d}/{:d}".format(ram.used >> 20, ram.total >> 20), inline=False)
-        embed.add_field(name="Kernel:", value=kernel, inline=False)
+        ram_used = ram.used >> 20
+        ram_total = ram.total >> 20
+        embed = discord.Embed(
+            title="Smoczyca v2137 running on discord.py ver:", description=discord.__version__)
+        embed.add_field(
+            name='CPUInfo:', value=f'__Arch:__ {cpu} | __Usage:__ {cpu_usage}/100', inline=False)
+        embed.add_field(
+            name='RAM:', value=f'__Usage__: {ram_used}/{ram_total}', inline=False)
+        embed.add_field(name='Kernel:', value=kernel, inline=False)
         await ctx.send(embed=embed)
     else:
         await ctx.send("Incorrect permission!")
@@ -109,17 +80,20 @@ async def system(ctx):
 async def glac(ctx, arg='s1'):
     data = glac_lib.read(arg)
     if data is not None:
-        embed = discord.Embed(title="Status glacy", description="[{0}] Kochajmy glacowiczów, tak szybko umierają.".format(arg))
+        embed = discord.Embed(
+            title='Status glacy [DEPRECATED AT 15.03.2020]',
+            description=f'[{arg}] Kochajmy glacowiczów, tak szybko umierają.'
+        )
         embed.add_field(name="Anioły", value=data["angels"]["progress"], inline=False)
         embed.add_field(name="Demony", value=data["demons"]["progress"], inline=False)
         await ctx.send(embed=embed)
     else:
-        await ctx.send("Server not found!")
+        await ctx.send('Server not found!')
 
 
 @bot.command()
 async def avatar(ctx):
-    if len(ctx.message.mentions) > 0:
+    if ctx.message.mentions:
         for user in ctx.message.mentions:
             await ctx.send(user.avatar_url)
 
@@ -131,6 +105,6 @@ async def choose(ctx, *args):
         choose = content.split('|')
         await ctx.send(choose[random.randint(0, len(choose)-1)])
     else:
-        await ctx.send("No words to choose!")
+        await ctx.send('No words to choose!')
 
-bot.run(token)
+bot.run(config.get('token'))
