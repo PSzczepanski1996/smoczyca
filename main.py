@@ -1,4 +1,4 @@
-# Smoczyca 2020 by Hoshi Yemazaki, all memes reserved
+# Smoczyca 2022 by PSzczepanski1996
 import platform
 import random
 
@@ -12,7 +12,13 @@ from json_utils import (add_shitpost_record, delete_shitpost_record,
 
 config = read_json_file('config.json')
 desc = 'Smoczyca meme bot.'
-bot = commands.Bot(command_prefix="!", description=desc)
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(
+    intents=intents,
+    command_prefix='!',
+    description=desc,
+)
 init_file_existence('shitpost.json')
 
 
@@ -97,7 +103,7 @@ async def glac(ctx, arg='s1'):
 async def avatar(ctx):
     if ctx.message.mentions:
         for user in ctx.message.mentions:
-            await ctx.send(user.avatar_url)
+            await ctx.send(user.avatar.url)
 
 
 @bot.command()

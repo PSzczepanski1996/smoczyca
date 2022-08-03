@@ -1,5 +1,5 @@
 import json
-import urllib.request
+import requests
 
 
 def read(server):
@@ -7,7 +7,8 @@ def read(server):
         's1': 'https://glaca.nostale.club/api/pl/1/',
     }.get(server, None)
     if api_url is not None:
-        with urllib.request.urlopen(api_url) as url:
-            data = json.loads(url.read().decode())
+        response = requests.get(api_url)
+        if response.status_code == 200:
+            data = json.loads(response.content)
             return data
     return None
