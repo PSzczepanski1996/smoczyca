@@ -6,12 +6,13 @@ import discord
 import psutil
 from discord.ext import commands
 
-import glac_lib
-from json_utils import (add_shitpost_record, delete_shitpost_record,
-                        init_file_existence, read_json_file)
+from utils import (add_message_record, delete_message_record,
+                   init_file_existence, read_json_file, get_commit_version)
+
+from consts import db_json_name
 
 config = read_json_file('config.json')
-desc = 'Smoczyca meme bot.'
+desc = 'Smoczyca bot made by KenSoft.'
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(
@@ -19,7 +20,7 @@ bot = commands.Bot(
     command_prefix='!',
     description=desc,
 )
-init_file_existence('shitpost.json')
+init_file_existence(db_json_name)
 
 
 @bot.event
@@ -30,19 +31,19 @@ async def on_ready():
 
 @bot.event
 async def on_command_error(ctx, error):
-    shitpost = read_json_file('shitpost.json')
+    get_msgs = read_json_file(db_json_name)
     command = ctx.message.content
-    if command in shitpost.keys():
-        await ctx.send(shitpost[command])
+    if command in get_msgs.keys():
+        await ctx.send(get_msgs[command])
 
 
 @bot.command()
 async def add(ctx, arg, *args):
     if ctx.message.author.top_role.name in config.get('allow_permission', []):
         if args and arg[0] == '!':
-            shitpost_keys = read_json_file('shitpost.json').get('shitpost', {}).keys()
-            if arg not in shitpost_keys:
-                add_shitpost_record(arg, ' '.join(args))
+            msg_keys = read_json_file(db_json_name).get('messages', {}).keys()
+            if arg not in msg_keys:
+                add_message_record(arg, ' '.join(args))
                 await ctx.send(f'Added command: {arg}')
             else:
                 await ctx.send('Command already exist!')
@@ -55,12 +56,12 @@ async def add(ctx, arg, *args):
 @bot.command()
 async def delete(ctx, arg):
     if ctx.message.author.top_role.name in config.get('allow_permission', []):
-        if delete_shitpost_record(arg):
+        if delete_message_record(arg):
             await ctx.send("Deleted command!")
         else:
-            await ctx.send("Nothing to delete!")
+            await ctx.send('Nothing to delete!')
     else:
-        await ctx.send("Incorrect permissions!")
+        await ctx.send('Incorrect permissions!')
 
 
 @bot.command()
@@ -72,8 +73,9 @@ async def system(ctx):
         kernel = platform.release()
         ram_used = ram.used >> 20
         ram_total = ram.total >> 20
+        hash_ver = get_commit_version()
         embed = discord.Embed(
-            title="Smoczyca v2137 running on discord.py ver:", description=discord.__version__)
+            title=f'Smoczyca [#{hash_ver}] running on discord.py ver:', description=discord.__version__)
         embed.add_field(
             name='CPUInfo:', value=f'__Arch:__ {cpu} | __Usage:__ {cpu_usage}/100', inline=False)
         embed.add_field(
@@ -81,29 +83,19 @@ async def system(ctx):
         embed.add_field(name='Kernel:', value=kernel, inline=False)
         await ctx.send(embed=embed)
     else:
-        await ctx.send("Incorrect permission!")
-
-
-@bot.command()
-async def glac(ctx, arg='s1'):
-    data = glac_lib.read(arg)
-    if data is not None:
-        embed = discord.Embed(
-            title='Status glacy [DEPRECATED AT 15.03.2020]',
-            description=f'[{arg}] Kochajmy glacowiczów, tak szybko umierają.'
-        )
-        embed.add_field(name="Anioły", value=data["angels"]["progress"], inline=False)
-        embed.add_field(name="Demony", value=data["demons"]["progress"], inline=False)
-        await ctx.send(embed=embed)
-    else:
-        await ctx.send('Server not found!')
+        await ctx.send('Incorrect permission!')
 
 
 @bot.command()
 async def avatar(ctx):
     if ctx.message.mentions:
-        for user in ctx.message.mentions:
-            await ctx.send(user.avatar.url)
+        mention = ctx.message.mentions[0]
+        await ctx.send(mention.avatar.url)
+
+
+@bot.command()
+async def ping(ctx):
+    await ctx.send(f'Pong! {round(bot.latency, 1)}')
 
 
 @bot.command()

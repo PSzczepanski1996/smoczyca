@@ -1,6 +1,8 @@
-"""Utils for JSON support instead of doing raw write to file."""
+"""Various utils made for KenSoft smoczyca bot."""
 import json
 import os
+import subprocess
+from consts import db_json_name
 
 
 def read_json_file(path):
@@ -17,9 +19,9 @@ def init_file_existence(path):
             json.dump({}, f, ensure_ascii=False, indent=4)
 
 
-def add_shitpost_record(command, raw_msg):
-    """Add shitpost record to json pseudo-db."""
-    with open('shitpost.json', 'r+', encoding='utf-8') as f:
+def add_message_record(command, raw_msg):
+    """Add message record to json pseudo-db."""
+    with open(db_json_name, 'r+', encoding='utf-8') as f:
         json_dict = json.load(f)
         f.seek(0)
         json_dict.update(
@@ -28,14 +30,21 @@ def add_shitpost_record(command, raw_msg):
         json.dump(json_dict, f, ensure_ascii=False, indent=4)
 
 
-def delete_shitpost_record(command):
-    """Remove shitpost record from json pseudo-db."""
-    with open('shitpost.json', 'r+', encoding='utf-8') as f:
+def delete_message_record(command):
+    """Remove message record from json pseudo-db."""
+    with open(db_json_name, 'r+', encoding='utf-8') as f:
         json_dict = json.load(f)
         if command in json_dict:
             del json_dict[command]
         else:
             return False
-    with open('shitpost.json', 'w+', encoding='utf-8') as f:
+    with open(db_json_name, 'w+', encoding='utf-8') as f:
         json.dump(json_dict, f, ensure_ascii=False, indent=4)
         return True
+
+
+def get_commit_version():
+    """Return SHORT commit number."""
+    return subprocess.check_output(
+        ['git', 'log', '--format="%H"', '-n 1'],
+    ).decode('ascii').replace('"', '')[:7]
