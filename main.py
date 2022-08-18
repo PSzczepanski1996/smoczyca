@@ -95,7 +95,7 @@ async def avatar(ctx):
 
 @bot.command()
 async def ping(ctx):
-    await ctx.send(f'Pong! {round(bot.latency, 1)}')
+    await ctx.send(f'Pong: {round(bot.latency, 7)}...')
 
 
 @bot.command()
