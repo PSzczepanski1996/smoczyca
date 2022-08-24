@@ -1,3 +1,6 @@
+![python](https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue)
+![discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)
+
 # Smoczyca
 ### An open-source discord bot for Nostale community
 
