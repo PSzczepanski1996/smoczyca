@@ -1,6 +1,6 @@
 __pycache__
 config.json
-shitpost.json
+messages.json
 venv
 screen.sh
 *.pyc

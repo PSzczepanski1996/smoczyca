@@ -39,29 +39,28 @@ async def on_command_error(ctx, error):
 
 @bot.command()
 async def add(ctx, arg, *args):
-    if ctx.message.author.top_role.name in config.get('allow_permission', []):
-        if args and arg[0] == '!':
-            msg_keys = read_json_file(db_json_name).get('messages', {}).keys()
-            if arg not in msg_keys:
-                add_message_record(arg, ' '.join(args))
-                await ctx.send(f'Added command: {arg}')
-            else:
-                await ctx.send('Command already exist!')
-        else:
-            await ctx.send('Command does not start with ! or either does not have content.')
-    else:
+    if ctx.message.author.top_role.name not in config.get('allow_permission', []):
         await ctx.send('Incorrect permission!')
+        return
+    if not args or arg[0] != '!':
+        await ctx.send('Command does not start with ! or either does not have content.')
+        return
+    msg_keys = read_json_file(db_json_name).keys()
+    if arg in msg_keys:
+        await ctx.send('Command already exist!')
+        return
+    await ctx.send(f'Added command: {arg}')
 
 
 @bot.command()
 async def delete(ctx, arg):
-    if ctx.message.author.top_role.name in config.get('allow_permission', []):
-        if delete_message_record(arg):
-            await ctx.send("Deleted command!")
-        else:
-            await ctx.send('Nothing to delete!')
-    else:
+    if ctx.message.author.top_role.name not in config.get('allow_permission', []):
         await ctx.send('Incorrect permissions!')
+        return
+    if not delete_message_record(arg):
+        await ctx.send('Nothing to delete!')
+        return
+    await ctx.send('Deleted command!')
 
 
 @bot.command()
