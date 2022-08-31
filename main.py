@@ -49,6 +49,7 @@ async def add(ctx, arg, *args):
     if arg in msg_keys:
         await ctx.send('Command already exist!')
         return
+    add_message_record(arg, ' '.join(args))
     await ctx.send(f'Added command: {arg}')
 
 
