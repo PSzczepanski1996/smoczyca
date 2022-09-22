@@ -5,11 +5,20 @@ import random
 import discord
 import psutil
 from discord.ext import commands
+from discord.ext.commands import DefaultHelpCommand
 
 from utils import (add_message_record, delete_message_record,
                    init_file_existence, read_json_file, get_commit_version)
 
 from consts import db_json_name
+
+
+class CustomHelpCommand(DefaultHelpCommand):
+
+    def __init__(self, **options):
+        super().__init__(**options)
+        self.no_category = 'General'
+
 
 config = read_json_file('config.json')
 desc = 'Smoczyca bot made by KenSoft.'
@@ -21,6 +30,7 @@ bot = commands.Bot(
     command_prefix='!',
     activity=activity,
     description=desc,
+    help_command=CustomHelpCommand(),
 )
 init_file_existence(db_json_name)
 
@@ -39,7 +49,7 @@ async def on_command_error(ctx, error):
         await ctx.send(get_msgs[command])
 
 
-@bot.command()
+@bot.command(brief='Adds and saves custom command to database')
 async def add(ctx, arg, *args):
     if ctx.message.author.top_role.name not in config.get('allow_permission', []):
         await ctx.send('Incorrect permission!')
@@ -55,7 +65,7 @@ async def add(ctx, arg, *args):
     await ctx.send(f'Added command: {arg}')
 
 
-@bot.command()
+@bot.command(brief='Deletes custom command from database')
 async def delete(ctx, arg):
     if ctx.message.author.top_role.name not in config.get('allow_permission', []):
         await ctx.send('Incorrect permissions!')
@@ -66,7 +76,7 @@ async def delete(ctx, arg):
     await ctx.send('Deleted command!')
 
 
-@bot.command()
+@bot.command(brief='Gives general bot system information')
 async def system(ctx):
     if ctx.message.author.top_role.name in config.get('allow_permission', []):
         ram = psutil.virtual_memory()
@@ -88,19 +98,19 @@ async def system(ctx):
         await ctx.send('Incorrect permission!')
 
 
-@bot.command()
+@bot.command(brief='Shows user avatar')
 async def avatar(ctx):
     if ctx.message.mentions:
         mention = ctx.message.mentions[0]
         await ctx.send(mention.avatar.url)
 
 
-@bot.command()
+@bot.command(brief='Estimates ping from bot server to discord')
 async def ping(ctx):
     await ctx.send(f'Pong: {round(bot.latency, 7)}...')
 
 
-@bot.command()
+@bot.command(brief='Dice roll')
 async def choose(ctx, *args):
     if len(args) > 2:
         content = ' '.join(args)
