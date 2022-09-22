@@ -15,9 +15,11 @@ config = read_json_file('config.json')
 desc = 'Smoczyca bot made by KenSoft.'
 intents = discord.Intents.default()
 intents.message_content = True
+activity = discord.Game('Python Virtualenv')
 bot = commands.Bot(
     intents=intents,
     command_prefix='!',
+    activity=activity,
     description=desc,
 )
 init_file_existence(db_json_name)
