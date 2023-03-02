@@ -1,4 +1,4 @@
-# Smoczyca 2022 by PSzczepanski1996
+# Smoczyca 2023 by PSzczepanski1996
 import platform
 import random
 
