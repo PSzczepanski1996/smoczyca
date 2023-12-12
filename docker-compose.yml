@@ -7,5 +7,6 @@ services:
       context: ./
       dockerfile: Dockerfile
     command: python main.py
+    restart: unless-stopped
     volumes:
       - .:/code
