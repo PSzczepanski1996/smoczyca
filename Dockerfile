@@ -2,8 +2,6 @@
 
 FROM python:3.12.1-bullseye
 WORKDIR /code
-COPY ./docker-scripts.sh /code/docker-scripts.sh
-RUN chmod +x /code/docker-scripts.sh && /code/docker-scripts.sh
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED=1
