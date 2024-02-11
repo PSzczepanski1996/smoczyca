@@ -8,7 +8,7 @@
 An discord.py bot for kensoft-driven community. Use it at own risk.  
 
 ##### Dependencies
-* python3 (tested on 3.11)
+* python3 (tested on 3.12)
 * discord.py 2.3.2
 
 ##### How to write your own config?
