@@ -8,7 +8,7 @@ from discord.ext import commands
 from discord.ext.commands import DefaultHelpCommand
 
 from utils import (add_message_record, delete_message_record,
-                   init_file_existence, read_json_file, get_commit_version)
+                   init_file_existence, read_json_file)
 
 from consts import db_json_name
 
@@ -85,9 +85,9 @@ async def system(ctx):
         kernel = platform.release()
         ram_used = ram.used >> 20
         ram_total = ram.total >> 20
-        hash_ver = get_commit_version()
+        # hash_ver = get_commit_version()
         embed = discord.Embed(
-            title=f'Smoczyca [#{hash_ver}] running on discord.py ver:', description=discord.__version__)
+            title=f'Smoczyca [#2137] running on discord.py ver:', description=discord.__version__)
         embed.add_field(
             name='CPUInfo:', value=f'__Arch:__ {cpu} | __Usage:__ {cpu_usage}/100', inline=False)
         embed.add_field(
