@@ -46,5 +46,5 @@ def delete_message_record(command):
 def get_commit_version():
     """Return SHORT commit number."""
     return subprocess.check_output(
-        ['git', 'log', '--format="%H"', '-n 1'],
+        ['git', 'rev-parse', 'HEAD'],
     ).decode('ascii').replace('"', '')[:7]
