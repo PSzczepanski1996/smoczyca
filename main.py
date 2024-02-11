@@ -1,11 +1,10 @@
-# Smoczyca 2023 by PSzczepanski1996
+# Smoczyca 2024 by PSzczepanski1996
 import platform
 import random
 
 import discord
 import psutil
 from discord import app_commands
-from discord.ext import commands
 from discord.ext.commands import DefaultHelpCommand
 
 from utils import (add_message_record, delete_message_record,
