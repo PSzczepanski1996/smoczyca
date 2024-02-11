@@ -36,7 +36,7 @@ tree = app_commands.CommandTree(client)
 init_file_existence(db_json_name)
 
 
-@tree.command
+@client.event
 async def on_ready():
     """Print that bot logged in as."""
     await tree.sync()
