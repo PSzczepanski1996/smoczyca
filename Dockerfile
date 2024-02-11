@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.12.1-bullseye
+FROM python:3.12.2-bullseye
 WORKDIR /code
 
 ENV PYTHONDONTWRITEBYTECODE 1
