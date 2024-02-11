@@ -1,10 +1,10 @@
-# Smoczyca 2024 by PSzczepanski1996
+# Smoczyca 2023 by PSzczepanski1996
 import platform
 import random
 
 import discord
 import psutil
-from discord import app_commands
+from discord.ext import commands
 from discord.ext.commands import DefaultHelpCommand
 
 from utils import (add_message_record, delete_message_record,
@@ -25,25 +25,23 @@ desc = 'Smoczyca bot made by KenSoft.'
 intents = discord.Intents.default()
 intents.message_content = True
 activity = discord.Game('Python Virtualenv')
-client = discord.Client(
+bot = commands.Bot(
     intents=intents,
-    command_prefix='/',
+    command_prefix='!',
     activity=activity,
     description=desc,
     help_command=CustomHelpCommand(),
 )
-tree = app_commands.CommandTree(client)
 init_file_existence(db_json_name)
 
 
-@client.event
+@bot.event
 async def on_ready():
     """Print that bot logged in as."""
-    await tree.sync()
-    print(f'Logged in as {client.user.name} | ID: {client.user.id}!')
+    print(f'Logged in as {bot.user.name} | ID: {bot.user.id}!')
 
 
-@client.event
+@bot.event
 async def on_command_error(ctx, error):
     get_msgs = read_json_file(db_json_name)
     command = ctx.message.content
@@ -51,7 +49,7 @@ async def on_command_error(ctx, error):
         await ctx.send(get_msgs[command])
 
 
-@tree.command(description='Adds and saves custom command to database')
+@bot.command(brief='Adds and saves custom command to database')
 async def add(ctx, arg, *args):
     if ctx.message.author.top_role.name not in config.get('allow_permission', []):
         await ctx.send('Incorrect permission!')
@@ -67,7 +65,7 @@ async def add(ctx, arg, *args):
     await ctx.send(f'Added command: {arg}')
 
 
-@tree.command(description='Deletes custom command from database')
+@bot.command(brief='Deletes custom command from database')
 async def delete(ctx, arg):
     if ctx.message.author.top_role.name not in config.get('allow_permission', []):
         await ctx.send('Incorrect permissions!')
@@ -78,7 +76,7 @@ async def delete(ctx, arg):
     await ctx.send('Deleted command!')
 
 
-@tree.command(description='Gives general bot system information')
+@bot.command(brief='Gives general bot system information')
 async def system(ctx):
     if ctx.message.author.top_role.name in config.get('allow_permission', []):
         ram = psutil.virtual_memory()
@@ -100,19 +98,19 @@ async def system(ctx):
         await ctx.send('Incorrect permission!')
 
 
-@tree.command(description='Shows user avatar')
+@bot.command(brief='Shows user avatar')
 async def avatar(ctx):
     if ctx.message.mentions:
         mention = ctx.message.mentions[0]
         await ctx.send(mention.avatar.url)
 
 
-@tree.command(description='Estimates ping from bot server to discord')
+@bot.command(brief='Estimates ping from bot server to discord')
 async def ping(ctx):
-    await ctx.send(f'Pong: {round(client.latency, 7)}...')
+    await ctx.send(f'Pong: {round(bot.latency, 7)}...')
 
 
-@tree.command(description='Dice roll')
+@bot.command(brief='Dice roll')
 async def choose(ctx, *args):
     if len(args) > 2:
         content = ' '.join(args)
@@ -121,4 +119,4 @@ async def choose(ctx, *args):
     else:
         await ctx.send('No words to choose!')
 
-client.run(config.get('token'))
+bot.run(config.get('token'))
