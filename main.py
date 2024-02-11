@@ -51,7 +51,7 @@ async def on_command_error(ctx, error):
         await ctx.send(get_msgs[command])
 
 
-@tree.command(brief='Adds and saves custom command to database')
+@tree.command(description='Adds and saves custom command to database')
 async def add(ctx, arg, *args):
     if ctx.message.author.top_role.name not in config.get('allow_permission', []):
         await ctx.send('Incorrect permission!')
@@ -67,7 +67,7 @@ async def add(ctx, arg, *args):
     await ctx.send(f'Added command: {arg}')
 
 
-@tree.command(brief='Deletes custom command from database')
+@tree.command(description='Deletes custom command from database')
 async def delete(ctx, arg):
     if ctx.message.author.top_role.name not in config.get('allow_permission', []):
         await ctx.send('Incorrect permissions!')
@@ -78,7 +78,7 @@ async def delete(ctx, arg):
     await ctx.send('Deleted command!')
 
 
-@tree.command(brief='Gives general bot system information')
+@tree.command(description='Gives general bot system information')
 async def system(ctx):
     if ctx.message.author.top_role.name in config.get('allow_permission', []):
         ram = psutil.virtual_memory()
@@ -100,19 +100,19 @@ async def system(ctx):
         await ctx.send('Incorrect permission!')
 
 
-@tree.command(brief='Shows user avatar')
+@tree.command(description='Shows user avatar')
 async def avatar(ctx):
     if ctx.message.mentions:
         mention = ctx.message.mentions[0]
         await ctx.send(mention.avatar.url)
 
 
-@tree.command(brief='Estimates ping from bot server to discord')
+@tree.command(description='Estimates ping from bot server to discord')
 async def ping(ctx):
-    await ctx.send(f'Pong: {round(bot.latency, 7)}...')
+    await ctx.send(f'Pong: {round(client.latency, 7)}...')
 
 
-@tree.command(brief='Dice roll')
+@tree.command(description='Dice roll')
 async def choose(ctx, *args):
     if len(args) > 2:
         content = ' '.join(args)
