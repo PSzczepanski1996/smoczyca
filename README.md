@@ -2,10 +2,10 @@
 ![discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)
 
 # Smoczyca
-### An open-source discord bot for KenSoft community
+### An open-source discord bot for own purposes
 
 ##### What it is?
-An discord.py bot for kensoft-driven community. Use it at own risk.  
+An discord.py bot written for own purposes. Use it at own risk.  
 
 ##### Dependencies
 * python3 (tested on 3.12)
