@@ -21,7 +21,7 @@ class CustomHelpCommand(DefaultHelpCommand):
 
 
 config = read_json_file('config.json')
-desc = 'Smoczyca bot made by KenSoft.'
+desc = 'Smoczyca bot made by PSzczepanski1996.'
 intents = discord.Intents.default()
 intents.message_content = True
 activity = discord.Game('Python Virtualenv')
